@@ -333,6 +333,8 @@ module FatesHistoryInterfaceMod
   integer :: ih_npp_froot_si
   integer :: ih_npp_croot_si
   integer :: ih_npp_stor_si
+  integer :: ih_sapwarea_si
+  integer :: ih_basalarea_si
   integer :: ih_leaf_mr_si
   integer :: ih_froot_mr_si
   integer :: ih_livestem_mr_si
@@ -403,6 +405,7 @@ module FatesHistoryInterfaceMod
   integer :: ih_growthflux_si_scpf
   integer :: ih_growthflux_fusion_si_scpf
   integer :: ih_ba_si_scpf
+  integer :: ih_sapwarea_si_scpf
   integer :: ih_agb_si_scpf
   integer :: ih_m1_si_scpf
   integer :: ih_m2_si_scpf
@@ -432,6 +435,7 @@ module FatesHistoryInterfaceMod
 
   ! indices to (site x scls [size class bins]) variables
   integer :: ih_ba_si_scls
+  integer :: ih_sapwarea_si_scls
   integer :: ih_nplant_si_scls
   integer :: ih_nplant_canopy_si_scls
   integer :: ih_nplant_understory_si_scls
@@ -1877,12 +1881,14 @@ end subroutine flush_hvars
                hio_npp_froot_si        => this%hvars(ih_npp_froot_si)%r81d, &
                hio_npp_croot_si        => this%hvars(ih_npp_croot_si)%r81d, &
                hio_npp_stor_si         => this%hvars(ih_npp_stor_si)%r81d, &
+               hio_sapwarea_si         => this%hvars(ih_sapwarea_si)%r81d, &
+               hio_basalarea_si        => this%hvars(ih_basalarea_si)%r81d, &
                hio_bstor_canopy_si_scpf      => this%hvars(ih_bstor_canopy_si_scpf)%r82d, &
                hio_bstor_understory_si_scpf  => this%hvars(ih_bstor_understory_si_scpf)%r82d, &
                hio_bleaf_canopy_si_scpf      => this%hvars(ih_bleaf_canopy_si_scpf)%r82d, &
                hio_bleaf_understory_si_scpf  => this%hvars(ih_bleaf_understory_si_scpf)%r82d, &
-               hio_mortality_canopy_si_scpf         => this%hvars(ih_mortality_canopy_si_scpf)%r82d, &
-               hio_mortality_understory_si_scpf     => this%hvars(ih_mortality_understory_si_scpf)%r82d, &
+               hio_mortality_canopy_si_scpf      => this%hvars(ih_mortality_canopy_si_scpf)%r82d, &
+               hio_mortality_understory_si_scpf  => this%hvars(ih_mortality_understory_si_scpf)%r82d, &
                hio_nplant_canopy_si_scpf     => this%hvars(ih_nplant_canopy_si_scpf)%r82d, &
                hio_nplant_understory_si_scpf => this%hvars(ih_nplant_understory_si_scpf)%r82d, &
                hio_ddbh_canopy_si_scpf       => this%hvars(ih_ddbh_canopy_si_scpf)%r82d, &
@@ -1893,10 +1899,11 @@ end subroutine flush_hvars
                hio_gpp_understory_si_scpf    => this%hvars(ih_gpp_understory_si_scpf)%r82d, &
                hio_ar_canopy_si_scpf         => this%hvars(ih_ar_canopy_si_scpf)%r82d, &
                hio_ar_understory_si_scpf     => this%hvars(ih_ar_understory_si_scpf)%r82d, &
-               hio_ddbh_si_scpf        => this%hvars(ih_ddbh_si_scpf)%r82d, &
+               hio_ddbh_si_scpf              => this%hvars(ih_ddbh_si_scpf)%r82d, &
                hio_growthflux_si_scpf        => this%hvars(ih_growthflux_si_scpf)%r82d, &
-               hio_growthflux_fusion_si_scpf        => this%hvars(ih_growthflux_fusion_si_scpf)%r82d, &
+               hio_growthflux_fusion_si_scpf => this%hvars(ih_growthflux_fusion_si_scpf)%r82d, &
                hio_ba_si_scpf          => this%hvars(ih_ba_si_scpf)%r82d, &
+               hio_sapwarea_si_scpf    => this%hvars(ih_sapwarea_si_scpf)%r82d, &
                hio_agb_si_scpf         => this%hvars(ih_agb_si_scpf)%r82d, &
                hio_nplant_si_scpf      => this%hvars(ih_nplant_si_scpf)%r82d, &
                hio_nplant_si_capf      => this%hvars(ih_nplant_si_capf)%r82d, &
@@ -1939,6 +1946,7 @@ end subroutine flush_hvars
                hio_fines_ag_elem       => this%hvars(ih_fines_bg_elem)%r82d, &
                hio_fines_bg_elem       => this%hvars(ih_fines_ag_elem)%r82d, &
                hio_ba_si_scls          => this%hvars(ih_ba_si_scls)%r82d, &
+               hio_sapwarea_si_scls    => this%hvars(ih_sapwarea_si_scls)%r82d, &
                hio_agb_si_scls          => this%hvars(ih_agb_si_scls)%r82d, &
                hio_biomass_si_scls          => this%hvars(ih_biomass_si_scls)%r82d, &
                hio_nplant_si_scls         => this%hvars(ih_nplant_si_scls)%r82d, &
@@ -2257,11 +2265,12 @@ end subroutine flush_hvars
                   ! endif
                end do
                
+               ! calculate the area of canopy that is within each height bin
                if (ccohort%canopy_layer .eq. 1) then
-                  ! calculate the area of canopy that is within each height bin
                   hio_canopy_height_dist_si_height(io_si,height_bin_max) = &
                        hio_canopy_height_dist_si_height(io_si,height_bin_max) + ccohort%c_area * AREA_INV
                endif
+
 
                ! Update biomass components
                ! Mass pools [kgC]
@@ -2402,7 +2411,6 @@ end subroutine flush_hvars
                   end if
                      
                end do
-               
 
 
                ! Update PFT crown area
@@ -2495,14 +2503,34 @@ end subroutine flush_hvars
 
                     ! Woody State Variables (basal area growth increment)
                     if ( int(prt_params%woody(ft)) == itrue) then
-
+        
                        ! basal area  [m2/ha]
+                       ! site-level 
+                       hio_basalarea_si(io_si) = hio_basalarea_si(io_si) + &
+                            0.25_r8*3.14159_r8*((dbh/100.0_r8)**2.0_r8)*ccohort%n
+
+                       ! by PFT and size class
                        hio_ba_si_scpf(io_si,scpf) = hio_ba_si_scpf(io_si,scpf) + &
                             0.25_r8*3.14159_r8*((dbh/100.0_r8)**2.0_r8)*ccohort%n
 
-                       ! also by size class only
+                       ! by size class only
                        hio_ba_si_scls(io_si,scls) = hio_ba_si_scls(io_si,scls) + &
                             0.25_r8*3.14159_r8*((dbh/100.0_r8)**2.0_r8)*ccohort%n
+
+
+                       ! sapwood area  [m2/ha]
+                       ! site-level 
+                       hio_sapwarea_si(io_si) = hio_sapwarea_si(io_si) + &
+                            ccohort%sapw_area * ccohort%n
+        
+                       ! by PFT and size class
+                       hio_sapwarea_si_scpf(io_si,scpf) = hio_sapwarea_si_scpf(io_si,scpf) + &
+                            ccohort%sapw_area * ccohort%n
+
+                       ! by size class only
+                       hio_sapwarea_si_scls(io_si,scls) = hio_sapwarea_si_scls(io_si,scls) + &
+                            ccohort%sapw_area * ccohort%n
+
 
                        ! growth increment
                        hio_ddbh_si_scpf(io_si,scpf) = hio_ddbh_si_scpf(io_si,scpf) + &
@@ -2920,6 +2948,7 @@ end subroutine flush_hvars
 
          end do
 
+
          ! pass the cohort termination mortality as a flux to the history, and then reset the termination mortality buffer
          ! note there are various ways of reporting the total mortality, so pass to these as well
          do i_pft = 1, numpft
@@ -3009,16 +3038,12 @@ end subroutine flush_hvars
                ! while in this loop, pass the fusion-induced growth rate flux to history
                hio_growthflux_fusion_si_scpf(io_si,i_scpf) = hio_growthflux_fusion_si_scpf(io_si,i_scpf) + &
                     sites(s)%growthflux_fusion(i_scls, i_pft) * days_per_year
-
-
-               
-
                
             end do
          end do
-         !
          
-         ! treat carbon flux from imort the same way
+         
+         ! treat carbon flux from import the same way
          hio_understory_mortality_carbonflux_si(io_si) = hio_understory_mortality_carbonflux_si(io_si) + &
               sites(s)%imort_carbonflux
          !
@@ -3059,6 +3084,7 @@ end subroutine flush_hvars
 
             end do
          end do
+         
          
          ! ------------------------------------------------------------------------------
          ! Some carbon only litter diagnostics (legacy)
@@ -3337,8 +3363,8 @@ end subroutine flush_hvars
 
          end do
 
-         ! Normalize nutrient storage fractions
 
+         ! Normalize nutrient storage fractions
          do el = 1, num_elements
 
             if(element_list(el).eq.carbon12_element)then
@@ -3448,6 +3474,9 @@ end subroutine flush_hvars
     return
   end subroutine update_history_dyn
  
+ 
+ 
+ 
   subroutine update_history_hifrq(this,nc,nsites,sites,bc_in,dt_tstep)
 
     ! ---------------------------------------------------------------------------------
@@ -3458,7 +3487,7 @@ end subroutine flush_hvars
     use EDTypesMod          , only : nclmax, nlevleaf
     !
     ! Arguments
-    class(fates_history_interface_type)                 :: this
+    class(fates_history_interface_type)             :: this
     integer                 , intent(in)            :: nc   ! clump index
     integer                 , intent(in)            :: nsites
     type(ed_site_type)      , intent(inout), target :: sites(nsites)
@@ -5452,6 +5481,11 @@ end subroutine update_history_hifrq
           avgflag='A', vtype=site_size_pft_r8, hlms='CLM:ALM', flushval=0.0_r8,    &
           upfreq=1, ivar=ivar, initialize=initialize_variables, index = ih_ba_si_scpf )
 
+    call this%set_history_var(vname='FATES_SAPWOODAREA_SCPF', units = 'm2/ha',               &
+          long='sapwood area by pft/size', use_default='inactive',   &
+          avgflag='A', vtype=site_size_pft_r8, hlms='CLM:ALM', flushval=0.0_r8,    &
+          upfreq=1, ivar=ivar, initialize=initialize_variables, index = ih_sapwarea_si_scpf )
+
     call this%set_history_var(vname='AGB_SCPF', units = 'kgC/m2', &
          long='Aboveground biomass by pft/size', use_default='inactive', &
          avgflag='A', vtype=site_size_pft_r8, hlms='CLM:ALM', flushval=0.0_r8, &
@@ -5670,6 +5704,11 @@ end subroutine update_history_hifrq
           long='basal area by size class', use_default='active',   &
           avgflag='A', vtype=site_size_r8, hlms='CLM:ALM', flushval=0.0_r8,    &
           upfreq=1, ivar=ivar, initialize=initialize_variables, index = ih_ba_si_scls )
+
+    call this%set_history_var(vname='FATES_SAPWOODAREA_SZ', units = 'm2/ha',               &
+          long='sapwood area by size class', use_default='active',   &
+          avgflag='A', vtype=site_size_r8, hlms='CLM:ALM', flushval=0.0_r8,    &
+          upfreq=1, ivar=ivar, initialize=initialize_variables, index = ih_sapwarea_si_scls )
 
     call this%set_history_var(vname='AGB_SCLS', units = 'kgC/m2',               &
           long='Aboveground biomass by size class', use_default='active',   &
@@ -6274,6 +6313,17 @@ end subroutine update_history_hifrq
           long='NPP flux into storage tissues', use_default='active',               &
           avgflag='A', vtype=site_r8, hlms='CLM:ALM', flushval=0.0_r8,    &
           upfreq=1, ivar=ivar, initialize=initialize_variables, index = ih_npp_stor_si )
+
+    call this%set_history_var(vname='FATES_SAPWOODAREA', units='m2/ha',       &
+          long='Sapwood area', use_default='active',               &
+          avgflag='A', vtype=site_r8, hlms='CLM:ALM', flushval=0.0_r8,    &
+          upfreq=1, ivar=ivar, initialize=initialize_variables, index = ih_sapwarea_si )
+
+    call this%set_history_var(vname='FATES_BASALAREA', units='m2/ha',       &
+          long='Basal area', use_default='active',               &
+          avgflag='A', vtype=site_r8, hlms='CLM:ALM', flushval=0.0_r8,    &
+          upfreq=1, ivar=ivar, initialize=initialize_variables, index = ih_basalarea_si )
+
 
 
     ! PLANT HYDRAULICS

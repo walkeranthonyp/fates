@@ -771,8 +771,8 @@ contains
     real(r8),intent(in)           :: canopy_trim
     real(r8),intent(out)          :: sapw_area   ! cross section area of
                                                  ! plant sapwood at reference [m2]
-    real(r8),intent(out)          :: bsap        ! plant leaf biomass [kgC]
-    real(r8),intent(out),optional :: dbsapdd     ! change leaf biomass
+    real(r8),intent(out)          :: bsap        ! plant sapwood biomass [kgC]
+    real(r8),intent(out),optional :: dbsapdd     ! change sapwood biomass
                                                  !  per d [kgC/cm]
 
     real(r8) :: h         ! Plant height [m]
@@ -1040,6 +1040,8 @@ contains
     return
  end subroutine bbgw_const
 
+
+
  ! ============================================================================
  ! Specific d2bsap relationships
  ! ============================================================================
@@ -1070,15 +1072,16 @@ contains
     integer(i4),intent(in) :: ipft      ! PFT index
     real(r8),intent(out)   :: sapw_area ! area of sapwood crosssection at 
                                         ! reference height [m2]
-    real(r8),intent(out)   :: bsap      ! plant leaf biomass [kgC]
-    real(r8),intent(out),optional :: dbsapdd   ! change leaf bio per diameter [kgC/cm]
+    real(r8),intent(out)   :: bsap      ! plant sapwood biomass [kgC]
+    real(r8),intent(out),optional :: dbsapdd   ! change sapwood bio per diameter [kgC/cm]
     
     real(r8)               :: la_per_sa  ! effective leaf area per sapwood area
                                          ! [m2/cm]
     real(r8)               :: term1      ! complex term for solving derivative
     real(r8)               :: dterm1_dh  ! deriv of term1 wrt height
     real(r8)               :: dterm1_dd  ! deriv of term1 wrt diameter
-    real(r8)               :: hbl2bsap   ! sapwood biomass per lineal height
+    real(r8)               :: hbl2bsap   ! sapwood biomass per lineal height 
+                                         ! [ha leaf / m3 wood]
     
     
     associate ( la_per_sa_int => prt_params%allom_la_per_sa_int(ipft), &
@@ -1106,7 +1109,7 @@ contains
       ! This is a term that combines unit conversion and specific leaf
       ! area.  This term does not contain the proportionality
       ! between leaf area and sapwood cross-section. This is
-      ! because their may be a height dependency, and will effect the 
+      ! because there may be a height dependency, and will affect the 
       ! derivative wrt diameter.
       hbl2bsap   = slatop * g_per_kg * wood_density * kg_per_Megag / (c2b*cm2_per_m2 )
 
@@ -1138,18 +1141,19 @@ contains
       term1 = h/(la_per_sa_int + h*la_per_sa_slp)
       bsap  = (hbl2bsap/agb_fraction) * term1 * bleaf 
 
-
       ! dbldmaxdd is deriv of blmax wrt dbh (use directives to check oop)
       ! dhdd is deriv of height wrt dbh (use directives to check oop)
       if(present(dbsapdd))then
          dterm1_dh = la_per_sa_int  / (la_per_sa_int + la_per_sa_slp*h)**2.0_r8
          dterm1_dd = dterm1_dh * dhdd
-         dbsapdd  = hbl2bsap/agb_fraction * (bleaf*dterm1_dd + term1 *dbleafdd)
+         dbsapdd   = hbl2bsap/agb_fraction * (bleaf*dterm1_dd + term1*dbleafdd)
       end if
       
     end associate
     return
   end subroutine bsap_ltarg_slatop
+
+
 
   ! ============================================================================
   ! Specific storage relationships
@@ -1178,6 +1182,7 @@ contains
 
      return
   end subroutine bstore_blcushion
+
 
 
   ! ============================================================================
@@ -1215,6 +1220,8 @@ contains
     return
   end subroutine d2blmax_salda
   
+
+
   ! ===========================================================================
   
   subroutine d2blmax_2pwr(d,p1,p2,c2b,blmax,dblmaxdd)
@@ -1243,6 +1250,8 @@ contains
     
     return
   end subroutine d2blmax_2pwr
+
+
 
   ! ===========================================================================
   
@@ -1284,6 +1293,8 @@ contains
     return
   end subroutine dh2blmax_2pwr
   
+
+
   ! =========================================================================
   ! Diameter to height (D2H) functions
   ! =========================================================================
@@ -1350,6 +1361,8 @@ contains
     return
   end subroutine d2h_chave2014
 
+
+
   ! ===========================================================================
   
   subroutine d2h_poorter2006(d,p1,p2,p3,dbh_maxh,h,dhdd)
@@ -1398,6 +1411,8 @@ contains
 
     return
   end subroutine d2h_poorter2006
+
+
 
   ! ===========================================================================
   
@@ -1459,6 +1474,8 @@ contains
     return
   end subroutine d2h_2pwr
   
+
+
   ! ============================================================================
   
   subroutine d2h_obrien(d,p1,p2,dbh_maxh,h,dhdd)
@@ -1486,6 +1503,8 @@ contains
     return
   end subroutine d2h_obrien
   
+
+
   ! ===========================================================================
   
   subroutine d2h_martcano(d,p1,p2,p3,dbh_maxh,h,dhdd)
@@ -1530,6 +1549,7 @@ contains
   end subroutine d2h_martcano
   
   
+
   ! =========================================================================
   ! Diameter to (2) above-ground biomass
   ! =========================================================================
@@ -1585,6 +1605,8 @@ contains
     return
   end subroutine dh2bagw_chave2014
   
+
+
   subroutine d2bagw_2pwr(d,p1,p2,c2b,bagw,dbagwdd)
     
     ! =========================================================================
@@ -1635,6 +1657,7 @@ contains
     return
   end subroutine d2bagw_2pwr
   
+
   
   subroutine dh2bagw_salda(d,h,dhdd,p1,p2,p3,p4, &
        wood_density,c2b,allom_agb_frac,bagw,dbagwdd)
@@ -1690,6 +1713,8 @@ contains
     return
   end subroutine dh2bagw_salda
   
+
+
   ! ============================================================================
   ! height to diameter conversions
   ! Note that these conversions will only back-calculate the actual diameter
@@ -1733,6 +1758,8 @@ contains
     return
   end subroutine h2d_chave2014
   
+
+
   ! ============================================================================
   
   subroutine h2d_poorter2006(h,p1,p2,p3,d,dddh)
@@ -1788,6 +1815,8 @@ contains
     return
   end subroutine h2d_poorter2006
   
+
+
   ! ============================================================================
   
   subroutine h2d_2pwr(h,p1,p2,d,dddh)
@@ -1812,6 +1841,8 @@ contains
     return
   end subroutine h2d_2pwr
   
+
+
   ! ============================================================================
   
   subroutine h2d_obrien(h,p1,p2,d,dddh)
@@ -1832,6 +1863,8 @@ contains
     return
   end subroutine h2d_obrien
   
+
+
   ! ============================================================================
   
   subroutine h2d_martcano(h,p1,p2,p3,d,dddh)
@@ -1871,8 +1904,9 @@ contains
     return
   end subroutine h2d_martcano
 
-  ! =====================================================================================
 
+
+  ! =====================================================================================
 
   subroutine CrownDepth(height,crown_depth)
 
@@ -1894,14 +1928,13 @@ contains
     crown_depth               = min(height,0.1_r8)
     
     return
- end subroutine CrownDepth
+  end subroutine CrownDepth
 
 
 
   ! =============================================================================
   ! Specific diameter to crown area allometries
   ! =============================================================================
-
   
   subroutine carea_2pwr(dbh,spread,d2bl_p2,d2bl_ediff,d2ca_min,d2ca_max,c_area,inverse)
 
@@ -1949,6 +1982,8 @@ contains
      
   end subroutine carea_2pwr
   
+
+
   ! =========================================================================
 
   subroutine set_root_fraction(root_fraction, ft, zi, max_nlevroot)
@@ -2050,6 +2085,8 @@ contains
     return
   end subroutine set_root_fraction
 
+
+
   ! =====================================================================================
     
   subroutine exponential_2p_root_profile(root_fraction, zi, a, b)
@@ -2105,6 +2142,8 @@ contains
     return
   end subroutine exponential_2p_root_profile
 
+
+
   ! =====================================================================================
   
   subroutine exponential_1p_root_profile(root_fraction, zi, a)
@@ -2142,6 +2181,8 @@ contains
     return
   end subroutine exponential_1p_root_profile
     
+
+
   ! =====================================================================================
 
   subroutine jackson_beta_root_profile(root_fraction, zi, a)
@@ -2178,8 +2219,9 @@ contains
     return
   end subroutine jackson_beta_root_profile
 
-  ! =====================================================================================
 
+
+  ! =====================================================================================
   
   real(r8) function decay_coeff_kn(pft,vcmax25top)
     
@@ -2210,8 +2252,9 @@ contains
     return
   end function decay_coeff_kn
 
-  ! =====================================================================================
 
+
+  ! =====================================================================================
 
   subroutine ForceDBH( ipft, canopy_trim, d, h, bdead, bl )
 
@@ -2348,6 +2391,8 @@ contains
 
      return
   end subroutine ForceDBH
+
+
 
   ! =========================================================================
   

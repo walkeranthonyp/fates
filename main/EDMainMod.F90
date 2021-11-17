@@ -8,22 +8,22 @@ module EDMainMod
   use shr_kind_mod             , only : r8 => shr_kind_r8
   
   use FatesGlobals             , only : fates_log
-  use FatesInterfaceTypesMod        , only : hlm_freq_day
-  use FatesInterfaceTypesMod        , only : hlm_day_of_year
-  use FatesInterfaceTypesMod        , only : hlm_days_per_year
-  use FatesInterfaceTypesMod        , only : hlm_current_year
-  use FatesInterfaceTypesMod        , only : hlm_current_month
-  use FatesInterfaceTypesMod        , only : hlm_current_day 
-  use FatesInterfaceTypesMod        , only : hlm_use_planthydro
-  use FatesInterfaceTypesMod        , only : hlm_parteh_mode
-  use FatesInterfaceTypesMod        , only : hlm_use_cohort_age_tracking
-  use FatesInterfaceTypesMod        , only : hlm_reference_date
-  use FatesInterfaceTypesMod        , only : hlm_use_ed_prescribed_phys
-  use FatesInterfaceTypesMod        , only : hlm_use_ed_st3 
-  use FatesInterfaceTypesMod        , only : bc_in_type
-  use FatesInterfaceTypesMod        , only : bc_out_type
-  use FatesInterfaceTypesMod        , only : hlm_masterproc
-  use FatesInterfaceTypesMod        , only : numpft
+  use FatesInterfaceTypesMod   , only : hlm_freq_day
+  use FatesInterfaceTypesMod   , only : hlm_day_of_year
+  use FatesInterfaceTypesMod   , only : hlm_days_per_year
+  use FatesInterfaceTypesMod   , only : hlm_current_year
+  use FatesInterfaceTypesMod   , only : hlm_current_month
+  use FatesInterfaceTypesMod   , only : hlm_current_day 
+  use FatesInterfaceTypesMod   , only : hlm_use_planthydro
+  use FatesInterfaceTypesMod   , only : hlm_parteh_mode
+  use FatesInterfaceTypesMod   , only : hlm_use_cohort_age_tracking
+  use FatesInterfaceTypesMod   , only : hlm_reference_date
+  use FatesInterfaceTypesMod   , only : hlm_use_ed_prescribed_phys
+  use FatesInterfaceTypesMod   , only : hlm_use_ed_st3 
+  use FatesInterfaceTypesMod   , only : bc_in_type
+  use FatesInterfaceTypesMod   , only : bc_out_type
+  use FatesInterfaceTypesMod   , only : hlm_masterproc
+  use FatesInterfaceTypesMod   , only : numpft
   use PRTGenericMod            , only : prt_carbon_allom_hyp
   use PRTGenericMod            , only : prt_cnp_flex_allom_hyp
   use PRTGenericMod            , only : nitrogen_element
@@ -81,20 +81,20 @@ module EDMainMod
   use ChecksBalancesMod        , only : SiteMassStock
   use EDMortalityFunctionsMod  , only : Mortality_Derivative
   use EDTypesMod               , only : AREA_INV
-  use PRTGenericMod,          only : carbon12_element
-  use PRTGenericMod,          only : all_carbon_elements
-  use PRTGenericMod,          only : leaf_organ
-  use PRTGenericMod,          only : fnrt_organ
-  use PRTGenericMod,          only : sapw_organ
-  use PRTGenericMod,          only : store_organ
-  use PRTGenericMod,          only : repro_organ
-  use PRTGenericMod,          only : struct_organ
-  use PRTLossFluxesMod,       only : PRTMaintTurnover
-  use PRTLossFluxesMod,       only : PRTReproRelease
-  use EDPftvarcon,            only : EDPftvarcon_inst
-  use FatesHistoryInterfaceMod, only : ih_nh4uptake_si, ih_no3uptake_si, ih_puptake_si
-  use FatesHistoryInterfaceMod, only : ih_nh4uptake_scpf, ih_no3uptake_scpf, ih_puptake_scpf
-  use FatesHistoryInterfaceMod, only : fates_hist
+  use PRTGenericMod            , only : carbon12_element
+  use PRTGenericMod            , only : all_carbon_elements
+  use PRTGenericMod            , only : leaf_organ
+  use PRTGenericMod            , only : fnrt_organ
+  use PRTGenericMod            , only : sapw_organ
+  use PRTGenericMod            , only : store_organ
+  use PRTGenericMod            , only : repro_organ
+  use PRTGenericMod            , only : struct_organ
+  use PRTLossFluxesMod         , only : PRTMaintTurnover
+  use PRTLossFluxesMod         , only : PRTReproRelease
+  use EDPftvarcon              , only : EDPftvarcon_inst
+  use FatesHistoryInterfaceMod , only : ih_nh4uptake_si, ih_no3uptake_si, ih_puptake_si
+  use FatesHistoryInterfaceMod , only : ih_nh4uptake_scpf, ih_no3uptake_scpf, ih_puptake_scpf
+  use FatesHistoryInterfaceMod , only : fates_hist
   
   ! CIME Globals
   use shr_log_mod         , only : errMsg => shr_log_errMsg
@@ -586,6 +586,7 @@ contains
 
     call SeedIn(currentSite,bc_in)
     
+
     ! Calculate all other litter fluxes
     ! -----------------------------------------------------------------------------------
 
@@ -593,8 +594,6 @@ contains
     do while(associated(currentPatch))
      
        call PreDisturbanceLitterFluxes( currentSite, currentPatch, bc_in)
-       
-
        call PreDisturbanceIntegrateLitter(currentPatch )
 
        currentPatch => currentPatch%older

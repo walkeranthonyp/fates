@@ -46,12 +46,12 @@ module EDTypesMod
   real(r8), parameter, public :: init_recruit_trim = 0.8_r8    ! This is the initial trimming value that
                                                                ! new recruits start with
 
+
   ! -------------------------------------------------------------------------------------
   ! Radiation parameters
   ! These should be part of the radiation module, but since we only have one option
   ! this is ok for now. (RGK 04-2018)
   ! -------------------------------------------------------------------------------------
-
 
   integer, parameter, public :: n_rad_stream_types = 2    ! The number of radiation streams used (direct/diffuse)
  
@@ -111,15 +111,11 @@ module EDTypesMod
 
 
   ! MODEL PARAMETERS
-
   real(r8), parameter, public :: area                 = 10000.0_r8 ! Notional area of simulated forest m2
-  real(r8), parameter, public :: area_inv             = 1.0e-4_r8  ! Inverse of the notion area (faster math)
-
+  real(r8), parameter, public :: area_inv             = 1.0e-4_r8  ! Inverse of the notional area (faster math)
   integer, parameter, public  :: numWaterMem          = 10         ! watermemory saved as site level var
-
   integer, parameter, public  :: numlevsoil_max       = 30         ! This is scratch space used for static arrays
                                                                    ! The actual number of soil layers should not exceed this
-
 
   ! BIOLOGY/BIOGEOCHEMISTRY        
   integer , parameter, public :: num_vegtemp_mem      = 10         ! Window of time over which we track temp for cold sensecence (days)
@@ -131,12 +127,10 @@ module EDTypesMod
   integer , parameter, public :: dtype_ilog           = 3          ! index for logging generated disturbance event
 
   ! Phenology status flag definitions (cold type is cstat, dry type is dstat)
-
   integer, parameter, public :: phen_cstat_nevercold = 0        ! This (location/plant) has not experienced a cold period over a large number
                                                         ! of days, leaves are dropped and flagged as non-cold region
   integer, parameter, public :: phen_cstat_iscold    = 1        ! This (location/plant) is in a cold-state where leaves should have fallen
   integer, parameter, public :: phen_cstat_notcold   = 2        ! This site is in a warm-state where leaves are allowed to flush
-
   integer, parameter, public :: phen_dstat_timeoff   = 0       ! Leaves off due to time exceedance (drought phenology)
   integer, parameter, public :: phen_dstat_moistoff  = 1       ! Leaves off due to moisture avail  (drought phenology)
   integer, parameter, public :: phen_dstat_moiston   = 2       ! Leaves on due to moisture avail   (drought phenology)
@@ -144,13 +138,13 @@ module EDTypesMod
 
 
   ! SPITFIRE     
-
   integer,  parameter, public :: NFSC                 = NCWD+2     ! number fuel size classes  (4 cwd size classes, leaf litter, and grass)
   integer,  parameter, public :: tw_sf                = 1          ! array index of twig pool for spitfire
   integer,  parameter, public :: lb_sf                = 3          ! array index of large branch pool for spitfire
   integer,  parameter, public :: tr_sf                = 4          ! array index of dead trunk pool for spitfire
   integer,  parameter, public :: dl_sf                = 5          ! array index of dead leaf pool for spitfire (dead grass and dead leaves)
   integer,  parameter, public :: lg_sf                = 6          ! array index of live grass pool for spitfire
+
 
   ! PATCH FUSION 
   real(r8), parameter, public :: force_patchfuse_min_biomass = 0.005_r8   ! min biomass (kg / m2 patch area) below which to force-fuse patches
@@ -160,12 +154,13 @@ module EDTypesMod
   real(r8), parameter, public :: patch_fusion_tolerance_relaxation_increment = 1.1_r8 ! amount by which to increment patch fusion threshold
   real(r8), parameter, public :: max_age_of_second_oldest_patch = 200._r8 ! age in years above which to combine all patches
 
+
   ! COHORT FUSION
   real(r8), parameter, public :: HITEMAX              = 30.0_r8    ! max dbh value used in hgt profile comparison 
   integer , parameter, public :: N_HITE_BINS          = 60         ! no. of hite bins used to distribute LAI
 
-  ! COHORT TERMINATION
 
+  ! COHORT TERMINATION
   real(r8), parameter, public :: min_npm2       = 1.0E-7_r8               ! minimum cohort number density per m2 before termination
   real(r8), parameter, public :: min_patch_area = 0.01_r8                 ! smallest allowable patch area before termination
   real(r8), parameter, public :: min_patch_area_forced = 0.0001_r8        ! patch termination will not fuse the youngest patch
@@ -205,10 +200,8 @@ module EDTypesMod
      type (ed_patch_type)  , pointer :: patchptr => null()       ! pointer to patch that cohort is in
 
 
-     
      ! Multi-species, multi-organ Plant Reactive Transport (PRT)
      ! Contains carbon and nutrient state variables for various plant organs
-
      class(prt_vartypes), pointer :: prt
 
      real(r8) :: l2fr                                    ! leaf to fineroot biomass ratio (this is constant
@@ -223,6 +216,7 @@ module EDTypesMod
      integer  ::  pft                                    ! pft number
      real(r8) ::  n                                      ! number of individuals in cohort per 'area' (10000m2 default)
      real(r8) ::  dbh                                    ! dbh: cm
+     real(r8) ::  sapw_area                              ! sapwood area: m2
      real(r8) ::  coage                                  ! cohort age in years
      real(r8) ::  hite                                   ! height: meters
      integer  ::  indexnumber                            ! unique number for each cohort. (within clump?)
@@ -261,8 +255,8 @@ module EDTypesMod
      integer  ::  coage_by_pft_class                     ! An index that indicates the cohorts position of the join cohort age class x PFT 
      integer ::  size_class_lasttimestep                 ! size class of the cohort at the last time step
 
-     ! CARBON FLUXES 
      
+     ! CARBON FLUXES 
      ! ----------------------------------------------------------------------------------
      ! NPP, GPP and RESP: Instantaneous, accumulated and accumulated-hold types.*
      ! 
@@ -293,18 +287,16 @@ module EDTypesMod
      real(r8) ::  c13disc_clm         ! carbon 13 discrimination in new synthesized carbon: part-per-mil, at each indiv/timestep
      real(r8) ::  c13disc_acc         ! carbon 13 discrimination in new synthesized carbon: part-per-mil, at each indiv/day, at the end of a day
 
-     ! Nutrient Fluxes (if N, P, etc. are turned on)
 
+     ! Nutrient Fluxes (if N, P, etc. are turned on)
      real(r8) :: daily_nh4_uptake ! integrated daily uptake of mineralized ammonium through competitive acquisition in soil [kg N / plant/ day]
      real(r8) :: daily_no3_uptake ! integrated daily uptake of mineralized nitrate through competitive acquisition in soil [kg N / plant/ day]
      real(r8) :: daily_p_uptake   ! integrated daily uptake of mineralized P through competitive acquisition in soil [kg P / plant/ day]
-
      real(r8) :: daily_c_efflux   ! daily mean efflux of excess carbon from roots into labile pool [kg C/plant/day]
      real(r8) :: daily_n_efflux   ! daily mean efflux of excess nitrogen from roots into labile pool [kg N/plant/day]
      real(r8) :: daily_p_efflux   ! daily mean efflux of excess phophorus from roots into labile pool [kg P/plant/day]
-
-     real(r8) :: daily_n_demand ! The daily amount of N demanded by the plant [kgN/plant/day]
-     real(r8) :: daily_p_demand ! The daily amount of P demanded by the plant [kgN/plant/day]
+     real(r8) :: daily_n_demand   ! The daily amount of N demanded by the plant [kgN]
+     real(r8) :: daily_p_demand   ! The daily amount of P demanded by the plant [kgN]
 
      
      ! The following four biophysical rates are assumed to be
@@ -321,14 +313,12 @@ module EDTypesMod
      real(r8) :: kp25top     ! canopy top: initial slope of CO2 response
                              ! curve (C4 plants) at 25C
 
-
-
      real(r8) ::  ts_net_uptake(nlevleaf)              ! Net uptake of leaf layers: kgC/m2/timestep
      real(r8) ::  year_net_uptake(nlevleaf)            ! Net uptake of leaf layers: kgC/m2/year
 
+
      ! RESPIRATION COMPONENTS
      real(r8) ::  rdark                                  ! Dark respiration: kgC/indiv/s
-
      real(r8) ::  resp_g_tstep                           ! Growth respiration:  kgC/indiv/timestep
      real(r8) ::  resp_m                                 ! Maintenance respiration:  kgC/indiv/timestep 
      real(r8) ::  resp_m_def                             ! Optional: (NOT IMPLEMENTED YET)
@@ -388,6 +378,8 @@ module EDTypesMod
      type(ed_cohort_hydr_type), pointer :: co_hydr       ! All cohort hydraulics data, see FatesHydraulicsMemMod.F90
 
   end type ed_cohort_type
+
+
 
   !************************************
   !** Patch type structure           **

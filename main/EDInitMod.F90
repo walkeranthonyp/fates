@@ -12,7 +12,7 @@ module EDInitMod
   use FatesGlobals              , only : endrun => fates_endrun
   use EDTypesMod                , only : nclmax
   use FatesGlobals              , only : fates_log
-  use FatesInterfaceTypesMod         , only : hlm_is_restart
+  use FatesInterfaceTypesMod    , only : hlm_is_restart
   use EDPftvarcon               , only : EDPftvarcon_inst
   use PRTParametersMod          , only : prt_params
   use EDCohortDynamicsMod       , only : create_cohort, fuse_cohorts, sort_cohorts
@@ -36,15 +36,15 @@ module EDInitMod
   use EDTypesMod                , only : phen_dstat_moistoff
   use EDTypesMod                , only : phen_cstat_notcold
   use EDTypesMod                , only : phen_dstat_moiston
-  use FatesInterfaceTypesMod         , only : bc_in_type,bc_out_type
-  use FatesInterfaceTypesMod         , only : hlm_use_planthydro
-  use FatesInterfaceTypesMod         , only : hlm_use_inventory_init
-  use FatesInterfaceTypesMod         , only : hlm_use_fixed_biogeog
-  use FatesInterfaceTypesMod         , only : numpft
-  use FatesInterfaceTypesMod         , only : nleafage
-  use FatesInterfaceTypesMod         , only : nlevsclass
-  use FatesInterfaceTypesMod         , only : nlevcoage
-  use FatesInterfaceTypesMod         , only : nlevage
+  use FatesInterfaceTypesMod    , only : bc_in_type,bc_out_type
+  use FatesInterfaceTypesMod    , only : hlm_use_planthydro
+  use FatesInterfaceTypesMod    , only : hlm_use_inventory_init
+  use FatesInterfaceTypesMod    , only : hlm_use_fixed_biogeog
+  use FatesInterfaceTypesMod    , only : numpft
+  use FatesInterfaceTypesMod    , only : nleafage
+  use FatesInterfaceTypesMod    , only : nlevsclass
+  use FatesInterfaceTypesMod    , only : nlevcoage
+  use FatesInterfaceTypesMod    , only : nlevage
   use FatesAllometryMod         , only : h2d_allom
   use FatesAllometryMod         , only : bagw_allom
   use FatesAllometryMod         , only : bbgw_allom
@@ -54,20 +54,20 @@ module EDInitMod
   use FatesAllometryMod         , only : bdead_allom
   use FatesAllometryMod         , only : bstore_allom
   use PRTGenericMod             , only : StorageNutrientTarget
-  use FatesInterfaceTypesMod,      only : hlm_parteh_mode
-  use PRTGenericMod,          only : prt_carbon_allom_hyp
-  use PRTGenericMod,          only : prt_cnp_flex_allom_hyp
-  use PRTGenericMod,          only : prt_vartypes
-  use PRTGenericMod,          only : leaf_organ
-  use PRTGenericMod,          only : fnrt_organ
-  use PRTGenericMod,          only : sapw_organ
-  use PRTGenericMod,          only : store_organ
-  use PRTGenericMod,          only : struct_organ
-  use PRTGenericMod,          only : repro_organ
-  use PRTGenericMod,          only : carbon12_element
-  use PRTGenericMod,          only : nitrogen_element
-  use PRTGenericMod,          only : phosphorus_element
-  use PRTGenericMod,          only : SetState
+  use FatesInterfaceTypesMod    , only : hlm_parteh_mode
+  use PRTGenericMod             , only : prt_carbon_allom_hyp
+  use PRTGenericMod             , only : prt_cnp_flex_allom_hyp
+  use PRTGenericMod             , only : prt_vartypes
+  use PRTGenericMod             , only : leaf_organ
+  use PRTGenericMod             , only : fnrt_organ
+  use PRTGenericMod             , only : sapw_organ
+  use PRTGenericMod             , only : store_organ
+  use PRTGenericMod             , only : struct_organ
+  use PRTGenericMod             , only : repro_organ
+  use PRTGenericMod             , only : carbon12_element
+  use PRTGenericMod             , only : nitrogen_element
+  use PRTGenericMod             , only : phosphorus_element
+  use PRTGenericMod             , only : SetState
 
   ! CIME GLOBALS
   use shr_log_mod               , only : errMsg => shr_log_errMsg

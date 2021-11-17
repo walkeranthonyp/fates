@@ -95,6 +95,9 @@ module EDCohortDynamicsMod
   use PRTAllometricCNPMod,    only : acnp_bc_in_id_netdnh4, acnp_bc_in_id_netdno3, acnp_bc_in_id_netdp
   use PRTAllometricCNPMod,    only : acnp_bc_out_id_cefflux, acnp_bc_out_id_nefflux
   use PRTAllometricCNPMod,    only : acnp_bc_out_id_pefflux
+  use PRTAllometricCNPMod,    only : acnp_bc_out_id_nneed
+  use PRTAllometricCNPMod,    only : acnp_bc_out_id_pneed
+  use PRTAllometricCNPMod,    only : acnp_bc_out_id_sapwarea
  
   
   use shr_infnan_mod, only : nan => shr_infnan_nan, assignment(=)  
@@ -420,6 +423,9 @@ contains
        call new_cohort%prt%RegisterBCOut(acnp_bc_out_id_cefflux, bc_rval = new_cohort%daily_c_efflux)
        call new_cohort%prt%RegisterBCOut(acnp_bc_out_id_nefflux, bc_rval = new_cohort%daily_n_efflux)
        call new_cohort%prt%RegisterBCOut(acnp_bc_out_id_pefflux, bc_rval = new_cohort%daily_p_efflux)
+       call new_cohort%prt%RegisterBCOut(acnp_bc_out_id_nneed,   bc_rval = new_cohort%daily_n_need)
+       call new_cohort%prt%RegisterBCOut(acnp_bc_out_id_pneed,   bc_rval = new_cohort%daily_p_need)
+       call new_cohort%prt%RegisterBCOut(acnp_bc_out_id_sapwarea,bc_rval = new_cohort%sapw_area)
        
        
     case DEFAULT
@@ -531,6 +537,7 @@ contains
 
     currentCohort%n                  = nan ! number of individuals in cohort per 'area' (10000m2 default)     
     currentCohort%dbh                = nan ! 'diameter at breast height' in cm
+    currentCohort%sapw_area          = nan ! 'sapwood area at breast height' in m2
     currentCohort%coage              = nan ! age of the cohort in years
     currentCohort%hite               = nan ! height: meters                   
     currentCohort%laimemory          = nan ! target leaf biomass- set from previous year: kGC per indiv
@@ -1765,6 +1772,7 @@ contains
     n%pft             = o%pft
     n%n               = o%n                         
     n%dbh             = o%dbh
+    n%sapw_area       = o%sapw_area
     n%coage           = o%coage 
     n%hite            = o%hite
     n%laimemory       = o%laimemory

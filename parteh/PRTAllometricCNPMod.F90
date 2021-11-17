@@ -163,8 +163,10 @@ module PRTAllometricCNPMod
   integer, public, parameter :: acnp_bc_out_id_cefflux = 1  ! Daily exudation of C  [kg]
   integer, public, parameter :: acnp_bc_out_id_nefflux = 2  ! Daily exudation of N  [kg]
   integer, public, parameter :: acnp_bc_out_id_pefflux = 3  ! Daily exudation of P  [kg]
+  integer, public, parameter :: acnp_bc_out_id_sapwarea = 6  ! sapwood area [m2/ha] 
   
-  integer, parameter         :: num_bc_out                = 5  ! Total number of
+  ! APW: is 6 correct, maybe for na dn p demand? Or should it be 4?  
+  integer, parameter         :: num_bc_out              = 6  ! Total number of
 
 
   ! Indices for parameters passed to the integrator
@@ -333,7 +335,6 @@ contains
 
   ! =====================================================================================
 
-
   subroutine DailyPRTAllometricCNP(this)
 
     class(cnp_allom_prt_vartypes) :: this
@@ -355,6 +356,7 @@ contains
     real(r8),pointer :: n_efflux   ! Total plant efflux of nitrogen (kgN)
     real(r8),pointer :: p_efflux   ! Total plant efflux of phosphorus (kgP)
     real(r8),pointer :: growth_r   ! Total plant growth respiration this step (kgC)
+    real(r8),pointer :: sapw_area  ! plant sapwood area (m2) APW 
 
     ! These are pointers to the state variables, rearranged in organ dimensioned
     ! arrays.  This is useful because we loop through organs so often
@@ -368,7 +370,7 @@ contains
     ! Agruments for allometry functions, that are not in the target_c array
     real(r8) :: agw_c_target,agw_dcdd_target
     real(r8) :: bgw_c_target,bgw_dcdd_target
-    real(r8) :: sapw_area
+    !APW: real(r8) :: sapw_area
     integer  :: cnp_limiter
     real(r8) :: max_store_n
     ! These arrays hold various support variables dimensioned by organ
@@ -395,31 +397,35 @@ contains
     real(r8) :: target_n,target_p
     real(r8) :: sum_c ! error checking sum
 
-    ! integrator variables
 
+    ! integrator variables
+    ! -----------------------------------------------------------------------------------
+
+    ! Input only boundary conditions
     ! Copy the input only boundary conditions into readable local variables
     ! We don't use pointers, because inputs should be intent in only
     ! Also, we save the initial values of many of these BC's
     ! for checking and resetting if needed
-    ! -----------------------------------------------------------------------------------
     c_gain      = this%bc_in(acnp_bc_in_id_netdc)%rval; c_gain0      = c_gain
     n_gain      = this%bc_in(acnp_bc_in_id_netdnh4)%rval + &
                   this%bc_in(acnp_bc_in_id_netdno3)%rval
-    n_gain0      = n_gain
+    n_gain0     = n_gain
     p_gain      = this%bc_in(acnp_bc_in_id_netdp)%rval; p_gain0      = p_gain
     canopy_trim = this%bc_in(acnp_bc_in_id_ctrim)%rval
     ipft        = this%bc_in(acnp_bc_in_id_pft)%ival
+
 
     ! Output only boundary conditions
     c_efflux    => this%bc_out(acnp_bc_out_id_cefflux)%rval;  c_efflux = 0._r8
     n_efflux    => this%bc_out(acnp_bc_out_id_nefflux)%rval;  n_efflux = 0._r8
     p_efflux    => this%bc_out(acnp_bc_out_id_pefflux)%rval;  p_efflux = 0._r8
+    ! APW: code add
+    sapw_area   => this%bc_out(acnp_bc_out_id_sapwarea)%rval; sapw_area = fates_unset_r8
 
     ! In/out boundary conditions
     maint_r_def => this%bc_inout(acnp_bc_inout_id_rmaint_def)%rval; maint_r_def0 = maint_r_def
     dbh         => this%bc_inout(acnp_bc_inout_id_dbh)%rval;        dbh0         = dbh
     l2fr        => this%bc_inout(acnp_bc_inout_id_l2fr)%rval
-    
     
     ! If more than 1 leaf age bin is present, this
     ! call advances leaves in their age, but does
@@ -437,6 +443,7 @@ contains
     allocate(state_n(num_organs))
     allocate(state_p(num_organs))
     
+    
     ! Set carbon targets based on the plant's current stature
     target_c(:) = fates_unset_r8
     target_dcdd(:) = fates_unset_r8
@@ -451,6 +458,7 @@ contains
     target_c(repro_id) = 0._r8
     target_dcdd(repro_id) = 0._r8
 
+    
     ! Initialize the the state, and keep a record of this state
     ! as we may actuall run the allocation process twice, and
     ! will need this state to both reset, and measure total
@@ -470,6 +478,7 @@ contains
        state_p0(i_org)  =  this%variables(i_var)%val(1)
        
     end do
+
 
     ! ===================================================================================
     ! Step 1: Evaluate nutrient storage in the plant. Depending on how low
@@ -499,6 +508,7 @@ contains
     p_gain = p_gain + sum(this%variables(i_var)%val(:))
     this%variables(i_var)%val(:) = 0._r8
     
+
     ! ===================================================================================
     ! Step 2.  Prioritized allocation to replace tissues from turnover, and/or pay
     ! any un-paid maintenance respiration from storage.
@@ -522,6 +532,7 @@ contains
        call endrun(msg=errMsg(sourcefile, __LINE__))
     end if
     
+
     ! ===================================================================================
     ! Step 3. Grow out the stature of the plant by allocating to tissues beyond
     ! current targets. 
@@ -545,6 +556,7 @@ contains
        write(fates_log(),*) maint_r_def0-maint_r_def
        call endrun(msg=errMsg(sourcefile, __LINE__))
     end if
+
 
     ! ===================================================================================
     ! Step 3. 
@@ -630,6 +642,7 @@ contains
     
     return
   end subroutine DailyPRTAllometricCNP
+
 
   ! =====================================================================================
   subroutine CNPAdjustFRootTargets(this)
@@ -740,6 +753,7 @@ contains
     real(r8) :: p_flux                   ! phosphorus flux into an arbitrary pool (kg)
     real(r8) :: maint_r_def_flux         ! Flux into maintenance respiration during priority 1 allocation
     real(r8) :: c_gain_flux              ! Flux used to pay back negative carbon gain (from storage) (kgC)
+    ! APW: necessary? doesn't seem to be used
     real(r8) :: sapw_area
     integer, parameter  :: n_max_priority = num_organs + 1 ! Maximum possible number of priority levels is
                                                            ! the total number organs plus 1, which allows
@@ -1548,6 +1562,7 @@ contains
     return
   end subroutine CNPStatureGrowth
   
+  
   ! =====================================================================================
 
   subroutine CNPAllocateRemainder(this,c_gain, n_gain, p_gain, &
@@ -1667,13 +1682,13 @@ contains
     n_efflux = max(0.0_r8,n_gain)
     p_efflux = max(0.0_r8,p_gain)
 
-
     c_gain = 0.0_r8
     n_gain = 0.0_r8
     p_gain = 0.0_r8
 
     return
   end subroutine CNPAllocateRemainder
+
 
   ! =====================================================================================
 
@@ -1737,7 +1752,8 @@ contains
     real(r8)         :: leaf_c_target,fnrt_c_target
     real(r8)         :: sapw_c_target,agw_c_target
     real(r8)         :: bgw_c_target,struct_c_target
-    
+
+  
     dbh         => this%bc_inout(acnp_bc_inout_id_dbh)%rval
     canopy_trim = this%bc_in(acnp_bc_in_id_ctrim)%rval
     ipft        = this%bc_in(acnp_bc_in_id_pft)%ival
@@ -1894,6 +1910,7 @@ contains
     
     return
   end subroutine ProportionalNutrAllocation
+
 
   ! =====================================================================================
 
@@ -2064,6 +2081,7 @@ contains
 
       return
    end function AllomCNPGrowthDeriv
+
 
    ! ====================================================================================
 

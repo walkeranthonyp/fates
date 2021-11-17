@@ -1149,10 +1149,12 @@ contains
 
                  ! Check for co2_inter_c convergence. Delta co2_inter_c/pair = mol/mol. 
                  ! Multiply by 10**6 to convert to umol/mol (ppm). Exit iteration if 
-                 ! convergence criteria of +/- 1 x 10**-6 ppm is met OR if at least ten 
-                 ! iterations (niter=10) are completed
+                 ! APW: convergence criteria of +/- 1 x 10**-6 ppm is met OR if at least five
+                 ! convergence criteria of +/- 1 x 10**-1 ppm is met OR if at least five
+                 ! iterations (niter=5) are completed
                  
-                 if ((abs(co2_inter_c-co2_inter_c_old)/can_press*1.e06_r8 <=  2.e-06_r8) &
+                 ! APW: if ((abs(co2_inter_c-co2_inter_c_old)/can_press*1.e06_r8 <=  2.e-06_r8) &
+                 if ((abs(co2_inter_c-co2_inter_c_old)/can_press*1.e06_r8 <=  2.e-01_r8) &
                        .or. niter == 5) then
                     loop_continue = .false.
                  end if
