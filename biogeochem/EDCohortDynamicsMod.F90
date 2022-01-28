@@ -95,8 +95,6 @@ module EDCohortDynamicsMod
   use PRTAllometricCNPMod,    only : acnp_bc_in_id_netdnh4, acnp_bc_in_id_netdno3, acnp_bc_in_id_netdp
   use PRTAllometricCNPMod,    only : acnp_bc_out_id_cefflux, acnp_bc_out_id_nefflux
   use PRTAllometricCNPMod,    only : acnp_bc_out_id_pefflux
-  use PRTAllometricCNPMod,    only : acnp_bc_out_id_nneed
-  use PRTAllometricCNPMod,    only : acnp_bc_out_id_pneed
   use PRTAllometricCNPMod,    only : acnp_bc_out_id_sapwarea
  
   
@@ -423,8 +421,6 @@ contains
        call new_cohort%prt%RegisterBCOut(acnp_bc_out_id_cefflux, bc_rval = new_cohort%daily_c_efflux)
        call new_cohort%prt%RegisterBCOut(acnp_bc_out_id_nefflux, bc_rval = new_cohort%daily_n_efflux)
        call new_cohort%prt%RegisterBCOut(acnp_bc_out_id_pefflux, bc_rval = new_cohort%daily_p_efflux)
-       call new_cohort%prt%RegisterBCOut(acnp_bc_out_id_nneed,   bc_rval = new_cohort%daily_n_need)
-       call new_cohort%prt%RegisterBCOut(acnp_bc_out_id_pneed,   bc_rval = new_cohort%daily_p_need)
        call new_cohort%prt%RegisterBCOut(acnp_bc_out_id_sapwarea,bc_rval = new_cohort%sapw_area)
        
        
